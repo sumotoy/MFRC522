@@ -2,6 +2,11 @@ MFRC522
 =======
 
 Arduino library for MFRC522 and other RFID RC522 based modules.
+This is a modified version from the https://github.com/miguelbalboa/rfid<br>
+of <b>miguel balboa</b> and I was not able to refork for some strange reason.<br>
+This is an attempt to let this library work with Teensy3.x and DUE, the original library was not working.<br>
+It's also compatible with SPI Transactions available on Teensy3 IDE and Arduino 1.5.8!<br>
+
 
 Read and write different types of Radio-Frequency IDentification (RFID) cards
 on your Arduino using a RC522 based reader connected via the Serial Peripheral
