@@ -46,7 +46,7 @@ void setup() {
 
     // Prepare the key (used both as key A and as key B)
     // using FFFFFFFFFFFFh which is the default at chip delivery from the factory
-    for (byte i = 0; i < 6; i++) {
+    for (uint8_t i = 0; i < 6; i++) {
         key.keyByte[i] = 0xFF;
     }
 
@@ -63,23 +63,20 @@ void setup() {
  */
 void loop() {
     // Look for new cards
-    if ( ! mfrc522.PICC_IsNewCardPresent())
-        return;
-
+    if (!mfrc522.PICC_IsNewCardPresent()) return;
     // Select one of the cards
-    if ( ! mfrc522.PICC_ReadCardSerial())
-        return;
+    if (!mfrc522.PICC_ReadCardSerial()) return;
 
     // Show some details of the PICC (that is: the tag/card)
     Serial.print("Card UID:");
     dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
     Serial.println();
     Serial.print("PICC type: ");
-    byte piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+    uint8_t piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
     Serial.println(mfrc522.PICC_GetTypeName(piccType));
 
     // Check for compatibility
-    if (    piccType != MFRC522::PICC_TYPE_MIFARE_MINI
+    if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI
         &&  piccType != MFRC522::PICC_TYPE_MIFARE_1K
         &&  piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
         Serial.println("This sample only works with MIFARE Classic cards.");
@@ -88,18 +85,18 @@ void loop() {
 
     // In this sample we use the second sector,
     // that is: sector #1, covering block #4 up to and including block #7
-    byte sector         = 1;
-    byte blockAddr      = 4;
-    byte dataBlock[]    = {
+    uint8_t sector         = 1;
+    uint8_t blockAddr      = 4;
+    uint8_t dataBlock[]    = {
         0x01, 0x02, 0x03, 0x04, //  1,  2,   3,  4,
         0x05, 0x06, 0x07, 0x08, //  5,  6,   7,  8,
         0x08, 0x09, 0xff, 0x0b, //  9, 10, 255, 12,
         0x0c, 0x0d, 0x0e, 0x0f  // 13, 14,  15, 16
     };
-    byte trailerBlock   = 7;
-    byte status;
-    byte buffer[18];
-    byte size = sizeof(buffer);
+    uint8_t trailerBlock   = 7;
+    uint8_t status;
+    uint8_t buffer[18];
+    uint8_t size = sizeof(buffer);
 
     // Authenticate using key A
     Serial.println("Authenticating using key A...");
@@ -161,8 +158,8 @@ void loop() {
     // Check that data in block is what we have written
     // by counting the number of bytes that are equal
     Serial.println("Checking result...");
-    byte count = 0;
-    for (byte i = 0; i < 16; i++) {
+    uint8_t count = 0;
+    for (uint8_t i = 0; i < 16; i++) {
         // Compare buffer (= what we've read) with dataBlock (= what we've written)
         if (buffer[i] == dataBlock[i])
             count++;
@@ -190,8 +187,8 @@ void loop() {
 /**
  * Helper routine to dump a byte array as hex values to Serial.
  */
-void dump_byte_array(byte *buffer, byte bufferSize) {
-    for (byte i = 0; i < bufferSize; i++) {
+void dump_byte_array(uint8_t *buffer, uint8_t bufferSize) {
+    for (uint8_t i = 0; i < bufferSize; i++) {
         Serial.print(buffer[i] < 0x10 ? " 0" : " ");
         Serial.print(buffer[i], HEX);
     }

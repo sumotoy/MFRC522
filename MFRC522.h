@@ -250,28 +250,28 @@ public:
 	// A struct used for passing the UID of a PICC.
 	/*
 	typedef struct {
-		byte		size;			// Number of bytes in the UID. 4, 7 or 10.
-		byte		uidByte[10];
-		byte		sak;			// The SAK (Select acknowledge) byte returned from the PICC after successful selection.
+		uint8_t		size;			// Number of bytes in the UID. 4, 7 or 10.
+		uint8_t		uidByte[10];
+		uint8_t		sak;			// The SAK (Select acknowledge) byte returned from the PICC after successful selection.
 	} Uid;
 	*/
     // A struct used for passing the UID of a PICC.
     struct Uid_struct {
-        byte        size;           // Number of bytes in the UID. 4, 7 or 10.
-        byte        uidByte[10];
-        byte        sak;            // The SAK (Select acknowledge) byte returned from the PICC after successful selection.
+        uint8_t        size;           // Number of bytes in the UID. 4, 7 or 10.
+        uint8_t        uidByte[10];
+        uint8_t        sak;            // The SAK (Select acknowledge) byte returned from the PICC after successful selection.
     } __attribute__((packed));
     typedef struct Uid_struct Uid;
 	
 	// A struct used for passing a MIFARE Crypto1 key
 	/*
 	typedef struct {
-		byte		keyByte[MF_KEY_SIZE];
+		uint8_t		keyByte[MF_KEY_SIZE];
 	} MIFARE_Key;
 	*/
     // A struct used for passing a MIFARE Crypto1 key
     struct MIFARE_Key_struct {
-        byte        keyByte[MF_KEY_SIZE];
+        uint8_t        keyByte[MF_KEY_SIZE];
     } __attribute__((packed));
     typedef struct MIFARE_Key_struct MIFARE_Key;
 	
@@ -279,12 +279,12 @@ public:
 	Uid uid;								// Used by PICC_ReadCardSerial().
 	
 	// Size of the MFRC522 FIFO
-	static const byte FIFO_SIZE = 64;		// The FIFO is 64 bytes.
+	static const uint8_t FIFO_SIZE = 64;		// The FIFO is 64 bytes.
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for setting up the Arduino
 	/////////////////////////////////////////////////////////////////////////////////////
-	MFRC522(byte chipSelectPin, byte resetPowerDownPin);
+	MFRC522(uint8_t chipSelectPin, uint8_t resetPowerDownPin);
 	#if !defined(SPI_HAS_TRANSACTION)
 	void setSPIConfig();
 	#endif
@@ -292,14 +292,14 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Basic interface functions for communicating with the MFRC522
 	/////////////////////////////////////////////////////////////////////////////////////
-	void PCD_WriteRegister(byte reg, byte value);
-	void PCD_WriteRegister(byte reg, byte count, byte *values);
-	byte PCD_ReadRegister(byte reg);
-	void PCD_ReadRegister(byte reg, byte count, byte *values, byte rxAlign = 0);
+	void PCD_WriteRegister(uint8_t reg, uint8_t value);
+	void PCD_WriteRegister(uint8_t reg, uint8_t count, uint8_t *values);
+	uint8_t PCD_ReadRegister(uint8_t reg);
+	void PCD_ReadRegister(uint8_t reg, uint8_t count, uint8_t *values, uint8_t rxAlign = 0);
 	void setBitMask(unsigned char reg, unsigned char mask);
-	void PCD_SetRegisterBitMask(byte reg, byte mask);
-	void PCD_ClearRegisterBitMask(byte reg, byte mask);
-	byte PCD_CalculateCRC(byte *data, byte length, byte *result);
+	void PCD_SetRegisterBitMask(uint8_t reg, uint8_t mask);
+	void PCD_ClearRegisterBitMask(uint8_t reg, uint8_t mask);
+	uint8_t PCD_CalculateCRC(uint8_t *data, uint8_t length, uint8_t *result);
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for manipulating the MFRC522
@@ -308,48 +308,48 @@ public:
 	void PCD_Reset();
 	void PCD_AntennaOn();
 	void PCD_AntennaOff();
-	byte PCD_GetAntennaGain();
-	void PCD_SetAntennaGain(byte mask);
-	
+	uint8_t PCD_GetAntennaGain();
+	void PCD_SetAntennaGain(uint8_t mask);
+	boolean digitalSelfTestPass();
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for communicating with PICCs
 	/////////////////////////////////////////////////////////////////////////////////////
-	byte PCD_TransceiveData(byte *sendData, byte sendLen, byte *backData, byte *backLen, byte *validBits = NULL, byte rxAlign = 0, bool checkCRC = false);
-	byte PCD_CommunicateWithPICC(byte command, byte waitIRq, byte *sendData, byte sendLen, byte *backData = NULL, byte *backLen = NULL, byte *validBits = NULL, byte rxAlign = 0, bool checkCRC = false);
+	uint8_t PCD_TransceiveData(uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen, uint8_t *validBits = NULL, uint8_t rxAlign = 0, bool checkCRC = false);
+	uint8_t PCD_CommunicateWithPICC(uint8_t command, uint8_t waitIRq, uint8_t *sendData, uint8_t sendLen, uint8_t *backData = NULL, uint8_t *backLen = NULL, uint8_t *validBits = NULL, uint8_t rxAlign = 0, bool checkCRC = false);
 
-	byte PICC_RequestA(byte *bufferATQA, byte *bufferSize);
-	byte PICC_WakeupA(byte *bufferATQA, byte *bufferSize);
-	byte PICC_REQA_or_WUPA(byte command, byte *bufferATQA, byte *bufferSize);	
-	byte PICC_Select(Uid *uid, byte validBits = 0);
-	byte PICC_HaltA();
+	uint8_t PICC_RequestA(uint8_t *bufferATQA, uint8_t *bufferSize);
+	uint8_t PICC_WakeupA(uint8_t *bufferATQA, uint8_t *bufferSize);
+	uint8_t PICC_REQA_or_WUPA(uint8_t command, uint8_t *bufferATQA, uint8_t *bufferSize);	
+	uint8_t PICC_Select(Uid *uid, uint8_t validBits = 0);
+	uint8_t PICC_HaltA();
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for communicating with MIFARE PICCs
 	/////////////////////////////////////////////////////////////////////////////////////
-	byte PCD_Authenticate(byte command, byte blockAddr, MIFARE_Key *key, Uid *uid);
+	uint8_t PCD_Authenticate(uint8_t command, uint8_t blockAddr, MIFARE_Key *key, Uid *uid);
 	void PCD_StopCrypto1();
-	byte MIFARE_Read(byte blockAddr, byte *buffer, byte *bufferSize);
-	byte MIFARE_Write(byte blockAddr, byte *buffer, byte bufferSize);
- 	byte MIFARE_Decrement(byte blockAddr, long delta);
-	byte MIFARE_Increment(byte blockAddr, long delta);
- 	byte MIFARE_Restore(byte blockAddr);
- 	byte MIFARE_Transfer(byte blockAddr);
-	byte MIFARE_Ultralight_Write(byte page, byte *buffer, byte bufferSize);
-    byte MIFARE_GetValue(byte blockAddr, long *value);
-    byte MIFARE_SetValue(byte blockAddr, long value);
+	uint8_t MIFARE_Read(uint8_t blockAddr, uint8_t *buffer, uint8_t *bufferSize);
+	uint8_t MIFARE_Write(uint8_t blockAddr, uint8_t *buffer, uint8_t bufferSize);
+ 	uint8_t MIFARE_Decrement(uint8_t blockAddr, long delta);
+	uint8_t MIFARE_Increment(uint8_t blockAddr, long delta);
+ 	uint8_t MIFARE_Restore(uint8_t blockAddr);
+ 	uint8_t MIFARE_Transfer(uint8_t blockAddr);
+	uint8_t MIFARE_Ultralight_Write(uint8_t page, uint8_t *buffer, uint8_t bufferSize);
+    uint8_t MIFARE_GetValue(uint8_t blockAddr, long *value);
+    uint8_t MIFARE_SetValue(uint8_t blockAddr, long value);
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Support functions
 	/////////////////////////////////////////////////////////////////////////////////////
-	byte PCD_MIFARE_Transceive(	byte *sendData, byte sendLen, bool acceptTimeout = false);
-	const char *GetStatusCodeName(byte code);
-	byte PICC_GetType(byte sak);
-	const char *PICC_GetTypeName(byte type);
+	uint8_t PCD_MIFARE_Transceive(	uint8_t *sendData, uint8_t sendLen, bool acceptTimeout = false);
+	const char *GetStatusCodeName(uint8_t code);
+	uint8_t PICC_GetType(uint8_t sak);
+	const char *PICC_GetTypeName(uint8_t type);
 	void PICC_DumpToSerial(Uid *uid);
-	void PICC_DumpMifareClassicToSerial(Uid *uid, byte piccType, MIFARE_Key *key);
-	void PICC_DumpMifareClassicSectorToSerial(Uid *uid, MIFARE_Key *key, byte sector);
+	void PICC_DumpMifareClassicToSerial(Uid *uid, uint8_t piccType, MIFARE_Key *key);
+	void PICC_DumpMifareClassicSectorToSerial(Uid *uid, MIFARE_Key *key, uint8_t sector);
 	void PICC_DumpMifareUltralightToSerial();
-	void MIFARE_SetAccessBits(byte *accessBitBuffer, byte g0, byte g1, byte g2, byte g3);
+	void MIFARE_SetAccessBits(uint8_t *accessBitBuffer, uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3);
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Convenience functions - does not add extra functionality
@@ -358,9 +358,9 @@ public:
 	bool PICC_ReadCardSerial();	
 
 private:
-	byte _chipSelectPin;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
-	byte _resetPowerDownPin;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
-	byte MIFARE_TwoStepHelper(byte command, byte blockAddr, long data);
+	uint8_t _chipSelectPin;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
+	uint8_t _resetPowerDownPin;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
+	uint8_t MIFARE_TwoStepHelper(uint8_t command, uint8_t blockAddr, long data);
 	void 	startSend();
 	void 	endSend();
 #if defined(SPI_HAS_TRANSACTION)

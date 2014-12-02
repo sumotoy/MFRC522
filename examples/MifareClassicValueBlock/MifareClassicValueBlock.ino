@@ -47,7 +47,7 @@ void setup() {
 
     // Prepare the key (used both as key A and as key B)
     // using FFFFFFFFFFFFh which is the default at chip delivery from the factory
-    for (byte i = 0; i < 6; i++) {
+    for (uint8_t i = 0; i < 6; i++) {
         key.keyByte[i] = 0xFF;
     }
 
@@ -76,7 +76,7 @@ void loop() {
     dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
     Serial.println();
     Serial.print("PICC type: ");
-    byte piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+    uint8_t piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
     Serial.println(mfrc522.PICC_GetTypeName(piccType));
 
     // Check for compatibility
@@ -89,13 +89,13 @@ void loop() {
 
     // In this sample we use the second sector,
     // that is: sector #1, covering block #4 up to and including block #7
-    byte sector         = 1;
-    byte valueBlockA    = 5;
-    byte valueBlockB    = 6;
-    byte trailerBlock   = 7;
-    byte status;
-    byte buffer[18];
-    byte size = sizeof(buffer);
+    uint8_t sector         = 1;
+    uint8_t valueBlockA    = 5;
+    uint8_t valueBlockB    = 6;
+    uint8_t trailerBlock   = 7;
+    uint8_t status;
+    uint8_t buffer[18];
+    uint8_t size = sizeof(buffer);
     long value;
 
     // Authenticate using key A
@@ -119,7 +119,7 @@ void loop() {
     //      Bytes 6-8:   Access Bits
     //      Bytes 9:     User data
     //      Bytes 10-15: Key B (or user data)
-    byte trailerBuffer[] = {
+    uint8_t trailerBuffer[] = {
         255, 255, 255, 255, 255, 255,       // Keep default key A
         0, 0, 0,
         0,
@@ -263,8 +263,8 @@ void loop() {
 /**
  * Helper routine to dump a byte array as hex values to Serial.
  */
-void dump_byte_array(byte *buffer, byte bufferSize) {
-    for (byte i = 0; i < bufferSize; i++) {
+void dump_byte_array(uint8_t *buffer, uint8_t bufferSize) {
+    for (uint8_t i = 0; i < bufferSize; i++) {
         Serial.print(buffer[i] < 0x10 ? " 0" : " ");
         Serial.print(buffer[i], HEX);
     }
@@ -273,10 +273,10 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
 /**
  * Ensure that a given block is formatted as a Value Block.
  */
-void formatValueBlock(byte blockAddr) {
-    byte buffer[18];
-    byte size = sizeof(buffer);
-    byte status;
+void formatValueBlock(uint8_t blockAddr) {
+    uint8_t buffer[18];
+    uint8_t size = sizeof(buffer);
+    uint8_t status;
 
     Serial.print("Reading block "); Serial.println(blockAddr);
     status = mfrc522.MIFARE_Read(blockAddr, buffer, &size);
@@ -286,24 +286,24 @@ void formatValueBlock(byte blockAddr) {
         return;
     }
 
-    if (    (buffer[0] == (byte)~buffer[4])
-        &&  (buffer[1] == (byte)~buffer[5])
-        &&  (buffer[2] == (byte)~buffer[6])
-        &&  (buffer[3] == (byte)~buffer[7])
+    if (    (buffer[0] == (uint8_t)~buffer[4])
+        &&  (buffer[1] == (uint8_t)~buffer[5])
+        &&  (buffer[2] == (uint8_t)~buffer[6])
+        &&  (buffer[3] == (uint8_t)~buffer[7])
 
         &&  (buffer[0] == buffer[8])
         &&  (buffer[1] == buffer[9])
         &&  (buffer[2] == buffer[10])
         &&  (buffer[3] == buffer[11])
 
-        &&  (buffer[12] == (byte)~buffer[13])
+        &&  (buffer[12] == (uint8_t)~buffer[13])
         &&  (buffer[12] ==        buffer[14])
-        &&  (buffer[12] == (byte)~buffer[15])) {
+        &&  (buffer[12] == (uint8_t)~buffer[15])) {
         Serial.println("Block has correct Value Block format.");
     }
     else {
         Serial.println("Formatting as Value Block...");
-        byte valueBlock[] = {
+        uint8_t valueBlock[] = {
             0, 0, 0, 0,
             255, 255, 255, 255,
             0, 0, 0, 0,

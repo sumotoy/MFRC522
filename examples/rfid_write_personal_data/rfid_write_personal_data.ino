@@ -27,125 +27,117 @@
 MFRC522 mfrc522(SS_PIN, RST_PIN);        // Create MFRC522 instance.
 
 void setup() {
-        Serial.begin(9600);        // Initialize serial communications with the PC
-        SPI.begin();                // Init SPI bus
-        mfrc522.PCD_Init();        // Init MFRC522 card
-        Serial.println("Write personal data on a MIFARE PICC ");
+  Serial.begin(9600);        // Initialize serial communications with the PC
+  SPI.begin();                // Init SPI bus
+  mfrc522.PCD_Init();        // Init MFRC522 card
+  Serial.println("Write personal data on a MIFARE PICC ");
 }
 
 void loop() {
-        
-        // Prepare key - all keys are set to FFFFFFFFFFFFh at chip delivery from the factory.
-        MFRC522::MIFARE_Key key;
-        for (byte i = 0; i < 6; i++) key.keyByte[i] = 0xFF;
-        
-        // Look for new cards
-        if ( ! mfrc522.PICC_IsNewCardPresent()) {
-                return;
-        }
+  // Prepare key - all keys are set to FFFFFFFFFFFFh at chip delivery from the factory.
+  MFRC522::MIFARE_Key key;
+  for (uint8_t i = 0; i < 6; i++) key.keyByte[i] = 0xFF;
+  // Look for new cards
+  if (!mfrc522.PICC_IsNewCardPresent()) return;
+  // Select one of the cards
+  if (!mfrc522.PICC_ReadCardSerial()) return;
+  Serial.print("Card UID:");    //Dump UID
+  for (uint8_t i = 0; i < mfrc522.uid.size; i++) {
+    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+    Serial.print(mfrc522.uid.uidByte[i], HEX);
+  } 
+  Serial.print(" PICC type: ");   // Dump PICC type
+  uint8_t piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+  Serial.println(mfrc522.PICC_GetTypeName(piccType));
+  uint8_t buffer[34];  
+  uint8_t block;
+  uint8_t status, len;
+  Serial.setTimeout(20000L) ;     // wait until 20 seconds for input from serial
+  // Ask personal data: Family name
+  Serial.println("Type Family name, ending with #");
+  len = Serial.readBytesUntil('#', (char *) buffer, 30) ; // read family name from serial
+  for (uint8_t i = len; i < 30; i++) buffer[i] = '\s';     // pad with spaces
 
-        // Select one of the cards
-        if ( ! mfrc522.PICC_ReadCardSerial())    return;
-        
-        Serial.print("Card UID:");    //Dump UID
-        for (byte i = 0; i < mfrc522.uid.size; i++) {
-          Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-          Serial.print(mfrc522.uid.uidByte[i], HEX);
-        } 
-        Serial.print(" PICC type: ");   // Dump PICC type
-        byte piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-        Serial.println(mfrc522.PICC_GetTypeName(piccType));
-         
-        byte buffer[34];  
-        byte block;
-        byte status, len;
-        
-        Serial.setTimeout(20000L) ;     // wait until 20 seconds for input from serial
-        // Ask personal data: Family name
-        Serial.println("Type Family name, ending with #");
-        len=Serial.readBytesUntil('#', (char *) buffer, 30) ; // read family name from serial
-        for (byte i = len; i < 30; i++) buffer[i] = '\s';     // pad with spaces
-        
-        block = 1;
-        //Serial.println("Authenticating using key A...");
-        status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
-        if (status != MFRC522::STATUS_OK) {
-           Serial.print("PCD_Authenticate() failed: ");
-           Serial.println(mfrc522.GetStatusCodeName(status));
-           return;
-        }
-        
-        // Write block
-	status = mfrc522.MIFARE_Write(block, buffer, 16);
-	if (status != MFRC522::STATUS_OK) {
-	    Serial.print("MIFARE_Write() failed: ");
-	    Serial.println(mfrc522.GetStatusCodeName(status));
-            return;
-	}
-        else Serial.println("MIFARE_Write() success: ");
+  block = 1;
+  //Serial.println("Authenticating using key A...");
+  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("PCD_Authenticate() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
 
-        block = 2;
-        //Serial.println("Authenticating using key A...");
-        status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
-        if (status != MFRC522::STATUS_OK) {
-           Serial.print("PCD_Authenticate() failed: ");
-           Serial.println(mfrc522.GetStatusCodeName(status));
-           return;
-        }
-        
-        // Write block
-	status = mfrc522.MIFARE_Write(block, &buffer[16], 16);
-	if (status != MFRC522::STATUS_OK) {
-	    Serial.print("MIFARE_Write() failed: ");
-	    Serial.println(mfrc522.GetStatusCodeName(status));
-            return;
-	}
-        else Serial.println("MIFARE_Write() success: ");
+  // Write block
+  status = mfrc522.MIFARE_Write(block, buffer, 16);
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("MIFARE_Write() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+  else Serial.println("MIFARE_Write() success: ");
 
-        // Ask personal data: First name
-        Serial.println("Type First name, ending with #");
-        len=Serial.readBytesUntil('#', (char *) buffer, 20) ; // read first name from serial
-        for (byte i = len; i < 20; i++) buffer[i] = '\s';     // pad with spaces
-        
-        block = 4;
-        //Serial.println("Authenticating using key A...");
-        status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
-        if (status != MFRC522::STATUS_OK) {
-           Serial.print("PCD_Authenticate() failed: ");
-           Serial.println(mfrc522.GetStatusCodeName(status));
-           return;
-        }
-        
-        // Write block
-	status = mfrc522.MIFARE_Write(block, buffer, 16);
-	if (status != MFRC522::STATUS_OK) {
-	    Serial.print("MIFARE_Write() failed: ");
-	    Serial.println(mfrc522.GetStatusCodeName(status));
-            return;
-	}
-        else Serial.println("MIFARE_Write() success: ");
+  block = 2;
+  //Serial.println("Authenticating using key A...");
+  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("PCD_Authenticate() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
 
-        block = 5;
-        //Serial.println("Authenticating using key A...");
-        status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
-        if (status != MFRC522::STATUS_OK) {
-           Serial.print("PCD_Authenticate() failed: ");
-           Serial.println(mfrc522.GetStatusCodeName(status));
-           return;
-        }
-        
-        // Write block
-	status = mfrc522.MIFARE_Write(block, &buffer[16], 16);
-	if (status != MFRC522::STATUS_OK) {
-	    Serial.print("MIFARE_Write() failed: ");
-	    Serial.println(mfrc522.GetStatusCodeName(status));
-            return;
-	}
-        else Serial.println("MIFARE_Write() success: ");
+  // Write block
+  status = mfrc522.MIFARE_Write(block, &buffer[16], 16);
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("MIFARE_Write() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+  else Serial.println("MIFARE_Write() success: ");
+
+  // Ask personal data: First name
+  Serial.println("Type First name, ending with #");
+  len=Serial.readBytesUntil('#', (char *) buffer, 20) ; // read first name from serial
+  for (uint8_t i = len; i < 20; i++) buffer[i] = '\s';     // pad with spaces
+
+  block = 4;
+  //Serial.println("Authenticating using key A...");
+  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("PCD_Authenticate() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+
+  // Write block
+  status = mfrc522.MIFARE_Write(block, buffer, 16);
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("MIFARE_Write() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+  else Serial.println("MIFARE_Write() success: ");
+
+  block = 5;
+  //Serial.println("Authenticating using key A...");
+  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("PCD_Authenticate() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+
+  // Write block
+  status = mfrc522.MIFARE_Write(block, &buffer[16], 16);
+  if (status != MFRC522::STATUS_OK) {
+    Serial.print("MIFARE_Write() failed: ");
+    Serial.println(mfrc522.GetStatusCodeName(status));
+    return;
+  }
+  else Serial.println("MIFARE_Write() success: ");
 
 
-        Serial.println(" ");
-        mfrc522.PICC_HaltA(); // Halt PICC
-        mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
-       
+  Serial.println(" ");
+  mfrc522.PICC_HaltA(); // Halt PICC
+  mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
+
 }
