@@ -7,6 +7,12 @@ of miguel balboa and I was not able to refork for some strange reason.
 This is an attempt to let this library work with Teensy3.x and DUE, the original library was not working.
 It's also compatible with SPI Transactions available on Teensy3 IDE and Arduino 1.5.8!
 
+Please, note that this library was inspired from the work of Dr.Leong and it's currently developed by Miguel Balboa, all infos
+and all notes are original from Miguel, I just posted here because I'm currently modify a bit to let Teensy3 users and
+32 bit micros like DUE to use it. 
+In the same time I'm try to fix some bug since this library it's not fully working properly and it waste a lot of resources 
+so probably in the future I will write a brand new light version.
+
 
 Read and write different types of Radio-Frequency IDentification (RFID) cards
 on your Arduino using a RC522 based reader connected via the Serial Peripheral
